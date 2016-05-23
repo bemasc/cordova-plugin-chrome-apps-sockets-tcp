@@ -1059,8 +1059,14 @@ public class ChromeSocketsTcp extends CordovaPlugin {
       try {
         bytesRead = channel.read(receiveDataBuffer);
 
-        if (bytesRead < 0)
-          throw new IOException("Socket closed by remote peer");
+        if (bytesRead < 0) {
+          // Error code -100 indicates remote connection close:
+          // https://code.google.com/p/chromium/codesearch#chromium/src/net/base/net_error_list.h
+          JSONObject info = buildErrorInfo(-100, "Socket closed by remote peer");
+          info.put("socketId", socketId);
+          sendReceiveEvent(new PluginResult(Status.ERROR, info));
+          return -1;
+        }
         if (bytesRead == 0) {
           Log.w(LOG_TAG, "no data read from socket");
           return 0;
