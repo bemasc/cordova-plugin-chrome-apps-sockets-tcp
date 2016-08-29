@@ -784,7 +784,7 @@ public class ChromeSocketsTcp extends CordovaPlugin {
       try {
         connected = channel.connect(new InetSocketAddress(address, port));
       } catch (UnresolvedAddressException e) {
-        connectCallback.error(e.getMessage());
+        connectCallback.error(buildErrorInfo(-105, e.getMessage()));
       }
 
       if (connected) {
